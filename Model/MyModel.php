@@ -24,7 +24,7 @@ class MyModel {
     }
 
     function htmlValidation($form_data) {
-        $form_data = trim(stripcslashes(htmlspecialchars($form_data)));
+        $form_data = trim(stripslashes(htmlspecialchars($form_data)));
         $form_data = mysqli_real_escape_string($this->connection, $form_data);
         return $form_data;
     }

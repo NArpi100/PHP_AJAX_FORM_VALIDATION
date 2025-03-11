@@ -136,6 +136,100 @@
         </div>
     </div>
     <!-- End Insert Modal -->
+     <!-- Start Of Update Modal -->
+     
+    <div class="modal fade" id="updateModalCenter" tabindex="-1" role="dialog" aria-labelledby="updateModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalCenterTitle">Update New Record</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" id="update_data">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="id"  class="form-control">
+                        <div class="form-group">
+                            <label><b>Employee Id</b></label>
+                            <input type="text" name="emp_id" id="emp_id"  class="form-control" placeholder="Employee Id">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Name</b></label>
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Meet Shah">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Email</b></label>
+                            <input type="text" name="email" id="email" class="form-control" placeholder="learnvern@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Department</b></label>
+                            <select class="custom-select" name="department" id="department">
+                                <option value="" selected>Choose...</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="R&D">R&D</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Quality">Quality</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Financial">Financial</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Administration">Administration</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><b>Designation</b></label>
+                            <input type="text" name="designation" id="designation" class="form-control" placeholder="Software Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Joining Date</b></label>
+                            <input type="date" name="joining_date" id="joining_date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="mr-3"><b>Gender :- </b></label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="male" name="gender" value="1" checked>
+                                <label class="form-check-label" >Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="female" name="gender" value="0">
+                                <label class="form-check-label" >Female</label>
+                            </div>
+                        </div>  
+                        <div class="form-group">
+                            <span class="success-msg" id="success_msg"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="close_click" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Update Modal -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" type="text/javascript"></script>
@@ -167,6 +261,78 @@
             })
 
         });
+
+
+
+
+        $(document).on("click", "button.editdata", function(){
+                var check_id = $(this).data('dataid');
+                //console.log(check_id);
+                $.getJSON("get_edit_data", {checkid: check_id}, function(json){
+                    //console.log(json);
+                    $("#updateModalCenter").modal('show');
+                    var jsonData = json.Data[0];
+                    console.log(jsonData);
+                    if(json.Code == 1){
+
+                        $('#id').val(jsonData.id);
+                        $('#emp_id').val(jsonData.emp_id);
+                        $('#name').val(jsonData.name);
+                        $('#email').val(jsonData.email);
+                        $('#designation').val(jsonData.designation);
+                        $('#joining_date').val(jsonData.joining_date);
+                        $("#department option[value='"+ jsonData.department +"']").prop("selected", "selected");
+                        if(jsonData.gender == 1){
+                            $('#male').prop("checked",true);
+                        } else {
+                            $('#female').prop("checked",true);
+                        }
+                    }
+
+                }).fail(function(){
+                    loadTable();
+                    showAlert('Something Went wrong!', 'Please try again later.', 'danger')
+                })
+            })
+
+            $('#update_data').on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: 'upd_emp_data',
+                    cache: false,
+                    dataType: 'json',
+                    data: $(this).serialize(),
+                }).done( function (dataResult) {
+                    (dataResult == true) ? 
+                    showAlert('Success! ', 'Data updated successfully!', 'success') :
+                    showAlert('Something went wrong! ', 'Please try again later.', 'danger');
+                }).fail( function (dataResult){
+                     showAlert('Something went wrong! ', 'Please try again later.', 'danger');
+                }).always( function() {
+                    loadTable();
+                    $("#updateModalCenter").modal('hide');
+                });
+            })
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         function showAlert(msg_title, msg_body, msg_type){
             var alert = $('div[role="alert"]');
@@ -209,7 +375,13 @@
                                 <td> ${ row.designation } </td>
                                 <td> ${ row.joining_date } </td>
                                 <td> ${ (row.gender == 1) ? 'Male' : 'Female' } </td>
-                                </tr>`;
+
+                              <td>
+                                    <button type="button" class="btn btn-info editdata" data-dataid="${ row.id }"> Update </button>
+                                    <button type="button" class="btn btn-danger editdata" data-dataid="${ row.id }"> Delete </button>
+                                </td>
+
+                         </tr>`;
                                 $("#tbl").append(bodyData);
                             })
                         } else {

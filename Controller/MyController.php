@@ -27,6 +27,21 @@ class MyController extends MyModel {
 
                     break;
 
+
+                    case '/get_edit_data':
+                    
+                    try{
+                        $all_data = $this->SelectData('employee',['id'=>$this->htmlValidation($_REQUEST['checkid'])]);
+
+                        echo json_encode($all_data);
+                    } catch (\Exception $ex) {
+                        throw $ex;
+                    }
+
+                    break;
+
+
+
                 case '/ins_emp_data':
                     
                     try{
@@ -46,6 +61,37 @@ class MyController extends MyModel {
                             $email = $this->htmlValidation($_POST['email']);
                             $insert = $this->InsertData('employee', $ins_data, $name , $email);
                             echo json_encode($insert);    
+                        } else {
+                            $Response = [
+                                'Data' => null,
+                                'Message' => 'Method must be POST.',
+                                'Code' => 0
+                            ];
+                            echo json_encode($Response);   
+                        }
+                        
+
+                    } catch (\Exception $ex) {
+                        throw $ex;
+                    }
+
+                    break;
+                case '/upd_emp_data':
+                    
+                    try{
+
+                        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                            $upd_data = [
+                                'emp_id' => $this->htmlValidation($_POST['emp_id']),
+                                'name' => $this->htmlValidation($_POST['name']),
+                                'email' => $this->htmlValidation($_POST['email']),
+                                'department' => $this->htmlValidation($_POST['department']),
+                                'designation' => $this->htmlValidation($_POST['designation']),
+                                'joining_date' => $this->htmlValidation($_POST['joining_date']),
+                                'gender' => $this->htmlValidation($_POST['gender']),
+                            ];
+                            $update = $this->UpdateData('employee', $upd_data, ['id'=>$this->htmlValidation($_POST['id'])]);
+                            echo json_encode($update);    
                         } else {
                             $Response = [
                                 'Data' => null,
